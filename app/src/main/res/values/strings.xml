@@ -37,6 +37,8 @@
     <string name="del_rf_card">删除房卡</string>
     <string name="add_fingerprint">添加指纹</string>
     <string name="del_fingerprint">删除指纹</string>
+    <string name="change_admin_pincode">修改管理密码</string>
+    <string name="gen_offline_pincode">生成离线密码</string>
     <string name="ready_to_swipe_rf_card">请刷卡！</string>
     <string name="bind_lock_succ">绑定成功！</string>
     <string name="bind_lock_fail">绑定失败！</string>
@@ -62,6 +64,8 @@
     <string name="multi_pincode_unlock_fail">多次密码开锁失败！</string>
     <string name="format_pincode_unlock_succ2">密码：%1$d开锁成功！</string>
     <string name="format_pincode_unlock_fail2">密码：%1$d未授权！</string>
+    <string name="format_offline_pincode_succ">生成离线密码：%1$d！</string>
+    <string name="format_offline_pincode_fail">生成出错：%1$s！</string>
     <string name="format_fingerprint_unlock_succ">指纹开锁成功，序号：%1$d！</string>
     <string name="multi_fingerprint_unlock_fail">多次指纹开锁失败！</string>
     <string name="format_nb_imei">设备IMEI号为：%1$s！</string>
@@ -77,6 +81,8 @@
     <string name="add_fingerprint_fail">添加指纹失败！</string>
     <string name="del_fingerprint_succ">删除指纹成功！</string>
     <string name="del_fingerprint_fail">删除指纹失败！</string>
+    <string name="change_admin_pincode_succ">修改管理密码成功！</string>
+    <string name="change_admin_pincode_fail">修改管理密码失败！</string>
     <string name="ready_to_press_fingerprint">请按压指纹！</string>
     <string name="action_to_press_fingerprint">请按下指纹！</string>
     <string name="action_to_leave_fingerprint">移开指纹</string>

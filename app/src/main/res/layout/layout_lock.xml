@@ -26,7 +26,7 @@
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="12dp"
+                  android:layout_marginTop="8dp"
                   android:orientation="horizontal">
 
         <Button android:id="@+id/btn_bind_lock"
@@ -50,7 +50,7 @@
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="12dp"
+                  android:layout_marginTop="8dp"
                   android:orientation="horizontal">
 
         <Button android:id="@+id/btn_lock_state"
@@ -74,7 +74,7 @@
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="12dp"
+                  android:layout_marginTop="8dp"
                   android:orientation="horizontal">
 
         <Button android:id="@+id/btn_nb_imei"
@@ -98,7 +98,7 @@
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="12dp"
+                  android:layout_marginTop="8dp"
                   android:orientation="horizontal">
 
         <Button android:id="@+id/btn_open_lock"
@@ -122,7 +122,7 @@
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="12dp"
+                  android:layout_marginTop="8dp"
                   android:orientation="horizontal">
 
         <Button android:id="@+id/btn_add_pincode"
@@ -146,7 +146,7 @@
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="12dp"
+                  android:layout_marginTop="8dp"
                   android:orientation="horizontal">
 
         <Button android:id="@+id/btn_add_rf_card"
@@ -170,7 +170,7 @@
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="12dp"
+                  android:layout_marginTop="8dp"
                   android:orientation="horizontal">
 
         <Button android:id="@+id/btn_add_fingerprint"
@@ -188,6 +188,28 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/del_fingerprint"/>
+
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="8dp"
+                  android:orientation="horizontal">
+
+        <Button android:id="@+id/btn_change_admin_pincode"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/change_admin_pincode"/>
+
+        <Button android:id="@+id/btn_gen_offline_pincode"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/gen_offline_pincode"/>
 
     </LinearLayout>
 </LinearLayout>

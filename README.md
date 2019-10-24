@@ -10,9 +10,31 @@
 ***
 ## 1.工程SDK配置
 
-工程主module的libs导入smartlock-sdk-v1.0.0.jar包即可
+1.1 工程主module的libs导入smartlock-sdk-v1.1.0.jar包
 
-LockCmdManager lockCmdManager = LockCmdManager();
+1.2 申请sdk appkey
+  发送邮件至logsoul@qq.com，申请appKey， 注明申请app主体信息，联系方式，bundleId，应用名称，应用说明，我们将于1～2个工作日处理。
+
+1.3 插件初始化
+<pre><code>
+//初始化
+var lockCmdManager: LockCmdManager = LockCmdManager()
+val data = lockCmdManager.intSdk(this, "your bundleId", "your appKey")
+Log.e("[initSdk]", data.toString())
+...
+//生成指令
+writeBytes(targetBleDevice!!, lockCmdManager.sendBindLock(lockName!!, lockId, lockManagerId, basecode))
+ ...
+ //解析指令回复json数据
+val rsp = lockCmdManager.parseBytes(lockName!!, basecode, data)
+when (rsp.cmd) {
+    "queryLockState" -> {
+        if (rsp.code == 200) {
+            val lockState = rsp.data as LockState
+        }
+    }
+}
+</code></pre> 
 
 
 ***
@@ -316,5 +338,43 @@ LockCmdManager lockCmdManager = LockCmdManager();
 
   >* return data: 
     >>imei: String类型，表示NB模组设备imei
+    
+## 6. WSJ_Qx 蓝牙取电开关指令接口
 
+### 6.1 蓝牙上电 sendOpenLockP1/sendOpenLockP2 
+  >bytes[] sendOpenLockP1(String devName, int basecode)
+  >* params: 
+    >>devName: String类型，取电开关名称
+    >>basecode: int类型，蓝牙通信加密码  
 
+   >* return data: 
+    >>randomN: int类型，上电第二步加密参数
+
+  >bytes[] sendOpenLockP2(String devName, int basecode, int randomN)
+  >* params: 
+    >>devName: String类型，取电开关蓝牙名称
+    >>basecode: int类型，蓝牙通信加密码  
+    >>randomN: int类型，上电第一步返回
+
+  >* return: 
+    >>code: int类型，200表示蓝牙上电成功，300表示蓝牙上电失败
+
+注意：蓝牙取电开关，当蓝牙上电后，蓝牙断开后延时5分钟断开。
+
+## 7. 门锁离线密码生成接口
+
+### 7.1 生成离线密码 genOfflinePincode
+  >fun genOfflinePincode(devName: String, lockMac: String, basecode: Int, pwdType: Int, startTime: Date, endTime: Date)
+  >* params: 
+    >>devName: String类型，锁蓝牙名称
+    >>lockMac: String类型，锁蓝牙MAC
+    >>basecode: int类型，蓝牙通信加密码
+    >>pwdType: int类型，离线密码类型，0是限时，1是单次，3是清理密码
+    >>startTime: Date类型，离线密码生效时间，取本地时钟，例如中国为UTC+8时间，忽略即时生效
+    >>endTime: Date类型，离线密码失效时间，取本地时钟，例如中国为UTC+8时间
+
+   >* return data: 
+    >>code: int类型，200表示生成功能，其他失败
+    >>data: String类型，离线开锁密码或失败信息
+
+注意：若appId或appKey非法，则sdk init不成功，无法成功调用此接口。

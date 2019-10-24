@@ -23,6 +23,9 @@ import com.wunu.smartlink.sdk.model.*
 import com.wunu.smartlink.sdk.utils.Hex
 import kotlinx.android.synthetic.main.layout_lock.*
 import java.util.*
+import android.os.StrictMode
+
+
 
 
 class LockDetailActivity : AppCompatActivity() {
@@ -81,6 +84,10 @@ class LockDetailActivity : AppCompatActivity() {
 
         initLockUI()
         updateLockUI()
+
+        val  data = lockCmdManager.intSdk(this, "com.wunu.smartlink.demo", "d6e4aee6-5e99-4b9b-9d5f-4da02cdcd053")
+        Log.e("[data]", data.toString())
+
     }
 
     private fun initLockUI() {
@@ -160,6 +167,23 @@ class LockDetailActivity : AppCompatActivity() {
             lockTaskId = 72
             connectTo()
         }
+
+        btn_change_admin_pincode.setOnClickListener {
+            lockTaskId = 81
+            connectTo()
+        }
+
+        btn_gen_offline_pincode.setOnClickListener {
+            val timeStart = Date()
+            val timeEnd = Date(timeStart.time + 300000)
+            val data = lockCmdManager.genOfflinePincode(lockName!!, macAddress!!, basecode, 0, timeStart, timeEnd)
+            Log.e("[data]", data.toString())
+            if(data.code == 200) {
+                showMsg(getString(R.string.format_offline_pincode_succ, (data.data as OfflinePincode).password))
+            }else{
+                showMsg(getString(R.string.format_offline_pincode_fail, data.data as String))
+            }
+        }
     }
 
     private fun updateLockUI() {
@@ -183,6 +207,9 @@ class LockDetailActivity : AppCompatActivity() {
 
         btn_add_fingerprint.isEnabled = isBindLock && lockModel > 70 && lockModel < 89 && !isFingerprintAdd && isLockLogin
         btn_del_fingerprint.isEnabled = isBindLock && lockModel > 70 && lockModel < 89 && isFingerprintAdd && isLockLogin
+
+        btn_change_admin_pincode.isEnabled = isBindLock && lockModel > 70
+        btn_gen_offline_pincode.isEnabled = isBindLock
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -648,6 +675,16 @@ class LockDetailActivity : AppCompatActivity() {
                                 showMsg(getString(R.string.del_fingerprint_succ))
                             }else{
                                 showMsg(getString(R.string.del_fingerprint_fail))
+                            }
+                            lockTaskId = 0
+                        }
+
+
+                        "changeAdminPincode" ->{
+                            if (rsp.code == 200) {
+                                showMsg(getString(R.string.change_admin_pincode_succ))
+                            }else{
+                                showMsg(getString(R.string.change_admin_pincode_fail))
                             }
                             lockTaskId = 0
                         }
