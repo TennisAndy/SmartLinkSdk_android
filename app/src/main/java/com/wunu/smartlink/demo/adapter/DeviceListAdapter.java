@@ -32,7 +32,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
         }
     }
 
-    interface OnAdapterItemClickListener {
+    public interface OnAdapterItemClickListener {
 
         void onAdapterViewClick(View view);
     }
