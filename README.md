@@ -10,7 +10,7 @@
 ***
 ## 1.工程SDK配置
 
-1.1 工程主module的libs导入smartlock-sdk-v1.1.0.jar包
+1.1 工程主module的libs导入smartlock-sdk-v1.2.0.jar包
 
 1.2 申请sdk appkey
   发送邮件至logsoul@qq.com，申请appKey， 注明申请app主体信息，联系方式，bundleId，应用名称，应用说明，我们将于1～2个工作日处理。

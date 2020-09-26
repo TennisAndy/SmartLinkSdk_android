@@ -20,13 +20,8 @@ import com.clj.fastble.callback.BleWriteCallback
 import com.wunu.smartlink.demo.util.WslLockUtil
 import com.wunu.smartlink.sdk.ILockCmd
 import com.wunu.smartlink.sdk.model.*
-import com.wunu.smartlink.sdk.utils.Hex
 import kotlinx.android.synthetic.main.layout_lock.*
 import java.util.*
-import android.os.StrictMode
-
-
-
 
 class LockDetailActivity : AppCompatActivity() {
 
