@@ -23,6 +23,7 @@ import com.wunu.smartlink.sdk.model.*
 import kotlinx.android.synthetic.main.layout_lock.*
 import java.util.*
 
+
 class LockDetailActivity : AppCompatActivity() {
 
     companion object {
@@ -62,8 +63,10 @@ class LockDetailActivity : AppCompatActivity() {
 
     var isNbLock = false
     var isFpLock = false
+    var isAlwaysOpen = false
+    var isMuted = false
 
-    var dialog: MaterialDialog ?= null
+    var dialog: MaterialDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,14 +83,19 @@ class LockDetailActivity : AppCompatActivity() {
         initLockUI()
         updateLockUI()
 
-        val  data = lockCmdManager.intSdk(this, "com.wunu.smartlink.demo", "d6e4aee6-5e99-4b9b-9d5f-4da02cdcd053")
+        val data = lockCmdManager.intSdk(
+            this,
+            "com.wunu.smartlink.demo",
+            "d6e4aee6-5e99-4b9b-9d5f-4da02cdcd053"
+        )
         Log.e("[data]", data.toString())
 
     }
 
     private fun initLockUI() {
         tv_dev_mac.text = getString(R.string.format_dev_mac, macAddress)
-        tv_dev_type.text = getString(R.string.format_dev_type, WslLockUtil.getLockType(this, lockName!!))
+        tv_dev_type.text =
+            getString(R.string.format_dev_type, WslLockUtil.getLockType(this, lockName!!))
 
         isNbLock = lockModel in 31..48 || lockModel in 81..88 || lockModel in 101..108
         isFpLock = lockModel in 71..88
@@ -168,14 +176,46 @@ class LockDetailActivity : AppCompatActivity() {
             connectTo()
         }
 
+        btn_query_slot_state.setOnClickListener {
+            lockTaskId = 91
+            connectTo()
+        }
+
+        btn_query_lock_state.setOnClickListener {
+            lockTaskId = 92
+            connectTo()
+        }
+
+        btn_switch_lock_state.setOnClickListener {
+            lockTaskId = 101
+            connectTo()
+        }
+
+        btn_switch_mute_state.setOnClickListener {
+            lockTaskId = 102
+            connectTo()
+        }
+
         btn_gen_offline_pincode.setOnClickListener {
             val timeStart = Date()
             val timeEnd = Date(timeStart.time + 300000)
-            val data = lockCmdManager.genOfflinePincode(lockName!!, macAddress!!, basecode, 0, timeStart, timeEnd)
+            val data = lockCmdManager.genOfflinePincode(
+                lockName!!,
+                macAddress!!,
+                basecode,
+                0,
+                timeStart,
+                timeEnd
+            )
             Log.e("[data]", data.toString())
-            if(data.code == 200) {
-                showMsg(getString(R.string.format_offline_pincode_succ, (data.data as OfflinePincode).password))
-            }else{
+            if (data.code == 200) {
+                showMsg(
+                    getString(
+                        R.string.format_offline_pincode_succ,
+                        (data.data as OfflinePincode).password
+                    )
+                )
+            } else {
                 showMsg(getString(R.string.format_offline_pincode_fail, data.data as String))
             }
         }
@@ -200,11 +240,17 @@ class LockDetailActivity : AppCompatActivity() {
         btn_add_rf_card.isEnabled = isBindLock && !isRfCardAdd && (isLockLogin || lockModel < 70)
         btn_del_rf_card.isEnabled = isBindLock && isRfCardAdd && (isLockLogin || lockModel < 70)
 
-        btn_add_fingerprint.isEnabled = isBindLock && lockModel > 70 && lockModel < 89 && !isFingerprintAdd && isLockLogin
-        btn_del_fingerprint.isEnabled = isBindLock && lockModel > 70 && lockModel < 89 && isFingerprintAdd && isLockLogin
+        btn_add_fingerprint.isEnabled =
+            isBindLock && lockModel > 70 && lockModel < 89 && !isFingerprintAdd && isLockLogin
+        btn_del_fingerprint.isEnabled =
+            isBindLock && lockModel > 70 && lockModel < 89 && isFingerprintAdd && isLockLogin
 
         btn_change_admin_pincode.isEnabled = isBindLock && lockModel > 70
         btn_gen_offline_pincode.isEnabled = isBindLock
+        btn_switch_lock_state.text =
+            getString(if (isAlwaysOpen) R.string.exit_always_open_mode else R.string.enter_always_open_mode)
+        btn_switch_mute_state.text =
+            getString(if (isMuted) R.string.exit_audio_muted_mode else R.string.enter_audio_muted_mode)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -225,7 +271,9 @@ class LockDetailActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        if (targetBleDevice != null && BleManager.getInstance().getConnectState(targetBleDevice!!) == BluetoothProfile.STATE_CONNECTED) {
+        if (targetBleDevice != null && BleManager.getInstance()
+                .getConnectState(targetBleDevice!!) == BluetoothProfile.STATE_CONNECTED
+        ) {
             BleManager.getInstance().disconnect(targetBleDevice)
         }
     }
@@ -252,7 +300,7 @@ class LockDetailActivity : AppCompatActivity() {
             override fun onConnectFail(bleDevice: BleDevice, exception: BleException) {
                 // 连接失败
                 supportActionBar?.title = lockName + " " + getString(R.string.state_disconnected)
-                if(dialog != null && dialog!!.isShowing)
+                if (dialog != null && dialog!!.isShowing)
                     dialog?.cancel()
 
                 dialog = MaterialDialog(this@LockDetailActivity).show {
@@ -299,8 +347,8 @@ class LockDetailActivity : AppCompatActivity() {
     }
 
     private fun showMsg(txt: String) {
-        if(dialog != null && dialog!!.isShowing)
-        dialog?.cancel()
+        if (dialog != null && dialog!!.isShowing)
+            dialog?.cancel()
 
         dialog = MaterialDialog(this@LockDetailActivity).show {
             title(R.string.notice)
@@ -336,9 +384,19 @@ class LockDetailActivity : AppCompatActivity() {
                         "reportLockBattery" -> {
                             val lockBattery = rsp.data as LockBattery
                             if (lockBattery.battery < 10) {
-                                showMsg(getString(R.string.format_lock_battery_low_warn, lockBattery.battery))
+                                showMsg(
+                                    getString(
+                                        R.string.format_lock_battery_low_warn,
+                                        lockBattery.battery
+                                    )
+                                )
                             } else if (lockBattery.battery < 30) {
-                                showMsg(getString(R.string.format_lock_battery_low_info, lockBattery.battery))
+                                showMsg(
+                                    getString(
+                                        R.string.format_lock_battery_low_info,
+                                        lockBattery.battery
+                                    )
+                                )
                             } else {
                                 showMsg(getString(R.string.report_lock_battery))
                             }
@@ -347,19 +405,29 @@ class LockDetailActivity : AppCompatActivity() {
                             if (lockModel > 70) {
                                 val result = rsp.data as IndexUnlockResult
                                 if (result.isValid) {
-                                    showMsg(getString(R.string.format_rf_card_unlock_succ, result.index))
+                                    showMsg(
+                                        getString(
+                                            R.string.format_rf_card_unlock_succ,
+                                            result.index
+                                        )
+                                    )
                                 } else {
                                     showMsg(getString(R.string.multi_rf_card_unlock_fail))
                                 }
                             } else {
                                 val result2 = rsp.data as RfCardUnlockResult
                                 if (lockTaskId == 61) {
-                                    if(dialog != null && dialog!!.isShowing)
+                                    if (dialog != null && dialog!!.isShowing)
                                         dialog?.cancel()
 
                                     dialog = MaterialDialog(this@LockDetailActivity).show {
                                         title(R.string.detect_new_rf_card)
-                                        message(text = getString(R.string.format_add_rf_card_or_not, result2.cardId.toString(16)))
+                                        message(
+                                            text = getString(
+                                                R.string.format_add_rf_card_or_not,
+                                                result2.cardId.toString(16)
+                                            )
+                                        )
                                         positiveButton(R.string.ok, null) {
                                             rfCardId = result2.cardId
                                             onAddRfCard()
@@ -375,7 +443,12 @@ class LockDetailActivity : AppCompatActivity() {
                                             )
                                         )
                                     } else {
-                                        showMsg(getString(R.string.multi_rf_card_unlock_fail2, result2.cardId.toString(16)))
+                                        showMsg(
+                                            getString(
+                                                R.string.multi_rf_card_unlock_fail2,
+                                                result2.cardId.toString(16)
+                                            )
+                                        )
                                     }
                                 }
                             }
@@ -385,16 +458,31 @@ class LockDetailActivity : AppCompatActivity() {
                             if (lockModel > 70) {
                                 val result = rsp.data as IndexUnlockResult
                                 if (result.isValid) {
-                                    showMsg(getString(R.string.format_pincode_unlock_succ, result.index))
+                                    showMsg(
+                                        getString(
+                                            R.string.format_pincode_unlock_succ,
+                                            result.index
+                                        )
+                                    )
                                 } else {
                                     showMsg(getString(R.string.multi_pincode_unlock_fail))
                                 }
                             } else {
                                 val result2 = rsp.data as PincodeUnlockResult
                                 if (result2.isValid) {
-                                    showMsg(getString(R.string.format_pincode_unlock_succ2, result2.pincode))
+                                    showMsg(
+                                        getString(
+                                            R.string.format_pincode_unlock_succ2,
+                                            result2.pincode
+                                        )
+                                    )
                                 } else {
-                                    showMsg(getString(R.string.format_pincode_unlock_fail2, result2.pincode))
+                                    showMsg(
+                                        getString(
+                                            R.string.format_pincode_unlock_fail2,
+                                            result2.pincode
+                                        )
+                                    )
                                 }
                             }
                         }
@@ -402,7 +490,12 @@ class LockDetailActivity : AppCompatActivity() {
                         "reportFingerprintResult" -> {
                             val result = rsp.data as IndexUnlockResult
                             if (result.isValid) {
-                                showMsg(getString(R.string.format_fingerprint_unlock_succ, result.index))
+                                showMsg(
+                                    getString(
+                                        R.string.format_fingerprint_unlock_succ,
+                                        result.index
+                                    )
+                                )
                             } else {
                                 showMsg(getString(R.string.multi_fingerprint_unlock_fail))
                             }
@@ -411,13 +504,19 @@ class LockDetailActivity : AppCompatActivity() {
                         "queryLockState" -> {
                             if (rsp.code == 200) {
                                 val lockState = rsp.data as LockState
-                                isBindLock = lockState.isBind
+                                isBindLock = lockState.bool
                                 updateLockUI()
-                                if(lockTaskId == 21) {
-                                    showMsg(getString(R.string.format_lock_state, lockState.mac, lockState.isBind))
+                                if (lockTaskId == 21) {
+                                    showMsg(
+                                        getString(
+                                            R.string.format_lock_state,
+                                            lockState.mac,
+                                            lockState.bool
+                                        )
+                                    )
                                 }
                             } else {
-                                if(lockTaskId == 21) {
+                                if (lockTaskId == 21) {
                                     showMsg(getString(R.string.cmd_rsp_fail))
                                 }
                             }
@@ -427,7 +526,12 @@ class LockDetailActivity : AppCompatActivity() {
                         "queryLockBattery" -> {
                             if (rsp.code == 200) {
                                 val lockBattery = rsp.data as LockBattery
-                                showMsg(getString(R.string.format_lock_battery, lockBattery.battery))
+                                showMsg(
+                                    getString(
+                                        R.string.format_lock_battery,
+                                        lockBattery.battery
+                                    )
+                                )
                             } else {
                                 showMsg(getString(R.string.cmd_rsp_fail))
                             }
@@ -468,7 +572,7 @@ class LockDetailActivity : AppCompatActivity() {
 
                         "sendOpenLockP1" -> {
                             if (rsp.code == 200) {
-                                if(lockTaskId == 32) { //登录
+                                if (lockTaskId == 32) { //登录
                                     writeBytes(
                                         targetBleDevice!!,
                                         lockCmdManager.login2(
@@ -477,7 +581,7 @@ class LockDetailActivity : AppCompatActivity() {
                                             (rsp.data as RandomN).randomN
                                         )
                                     )
-                                }else{  //开锁
+                                } else {  //开锁
                                     writeBytes(
                                         targetBleDevice!!,
                                         lockCmdManager.sendOpenLockP2(
@@ -488,9 +592,9 @@ class LockDetailActivity : AppCompatActivity() {
                                     )
                                 }
                             } else {
-                                if(lockTaskId == 32){
+                                if (lockTaskId == 32) {
                                     showMsg(getString(R.string.lock_login_fail))
-                                }else {
+                                } else {
                                     showMsg(getString(R.string.open_lock_fail))
                                 }
                                 lockTaskId = 0
@@ -500,36 +604,36 @@ class LockDetailActivity : AppCompatActivity() {
                         "login",
                         "sendOpenLockP2" -> {
                             if (rsp.code == 200) {
-                                if(lockTaskId == 32){
+                                if (lockTaskId == 32) {
                                     showMsg(getString(R.string.lock_login_succ))
-                                }else {
+                                } else {
                                     showMsg(getString(R.string.open_lock__succ))
                                 }
                                 isLockLogin = true
                                 updateLockUI()
                             } else {
-                                if(lockTaskId == 32){
+                                if (lockTaskId == 32) {
                                     showMsg(getString(R.string.lock_login_fail))
-                                }else {
+                                } else {
                                     showMsg(getString(R.string.open_lock_fail))
                                 }
                             }
                             lockTaskId = 0
                         }
 
-                        "syncClock" ->{
+                        "syncClock" -> {
                             val msgId = rsp.data as MsgId
                             if (rsp.code == 200) {
                                 showMsg(getString(R.string.sync_clock_succ))
-                            }else{
-                                when(msgId.msgId){
-                                    ILockCmd.MSG_OPERATION_FAIL ->{
+                            } else {
+                                when (msgId.msgId) {
+                                    ILockCmd.MSG_OPERATION_FAIL -> {
                                         showMsg(getString(R.string.sync_clock_fail))
                                     }
-                                    ILockCmd.MSG_ERROR_LOGIN_STATE_OFF ->{
+                                    ILockCmd.MSG_ERROR_LOGIN_STATE_OFF -> {
                                         showMsg(getString(R.string.error_login_state_off))
                                     }
-                                    ILockCmd.MSG_ERROR_TIME_INVALID ->{
+                                    ILockCmd.MSG_ERROR_TIME_INVALID -> {
                                         showMsg(getString(R.string.error_time_invalid))
                                     }
                                 }
@@ -537,24 +641,24 @@ class LockDetailActivity : AppCompatActivity() {
                             lockTaskId = 0
                         }
 
-                        "addPincode" ->{
+                        "addPincode" -> {
                             val msgId = rsp.data as MsgId
                             if (rsp.code == 200) {
                                 isPincodeAdd = true
                                 updateLockUI()
                                 showMsg(getString(R.string.add_pincode_succ))
-                            }else{
-                                when(msgId.msgId){
-                                    ILockCmd.MSG_OPERATION_FAIL ->{
+                            } else {
+                                when (msgId.msgId) {
+                                    ILockCmd.MSG_OPERATION_FAIL -> {
                                         showMsg(getString(R.string.add_pincode_fail))
                                     }
-                                    ILockCmd.MSG_ERROR_LOGIN_STATE_OFF ->{
+                                    ILockCmd.MSG_ERROR_LOGIN_STATE_OFF -> {
                                         showMsg(getString(R.string.error_login_state_off))
                                     }
-                                    ILockCmd.MSG_ERROR_TIME_INVALID ->{
+                                    ILockCmd.MSG_ERROR_TIME_INVALID -> {
                                         showMsg(getString(R.string.error_time_invalid))
                                     }
-                                    ILockCmd.MSG_ERROR_INDEX_INVALID ->{
+                                    ILockCmd.MSG_ERROR_INDEX_INVALID -> {
                                         showMsg(getString(R.string.error_index_invalid))
                                     }
                                 }
@@ -562,41 +666,41 @@ class LockDetailActivity : AppCompatActivity() {
                             lockTaskId = 0
                         }
 
-                        "delPincode" ->{
+                        "delPincode" -> {
                             if (rsp.code == 200) {
                                 isPincodeAdd = false
                                 updateLockUI()
                                 showMsg(getString(R.string.del_pincode_succ))
-                            }else{
+                            } else {
                                 showMsg(getString(R.string.del_pincode_fail))
                             }
                             lockTaskId = 0
                         }
 
-                        "addRfCard" ->{
+                        "addRfCard" -> {
                             val msgId = rsp.data as MsgId
                             if (rsp.code == 200) {
                                 isRfCardAdd = true
                                 updateLockUI()
                                 showMsg(getString(R.string.add_rf_card_succ))
-                            }else{
-                                when(msgId.msgId){
-                                    ILockCmd.MSG_OPERATION_FAIL ->{
+                            } else {
+                                when (msgId.msgId) {
+                                    ILockCmd.MSG_OPERATION_FAIL -> {
                                         showMsg(getString(R.string.add_rf_card_fail))
                                     }
-                                    ILockCmd.MSG_ERROR_LOGIN_STATE_OFF ->{
+                                    ILockCmd.MSG_ERROR_LOGIN_STATE_OFF -> {
                                         showMsg(getString(R.string.error_login_state_off))
                                     }
-                                    ILockCmd.MSG_ERROR_WAIT_TIMEOUT ->{
+                                    ILockCmd.MSG_ERROR_WAIT_TIMEOUT -> {
                                         showMsg(getString(R.string.error_wait_timeout))
                                     }
-                                    ILockCmd.MSG_ERROR_OPERATION_CANCEL ->{
+                                    ILockCmd.MSG_ERROR_OPERATION_CANCEL -> {
                                         showMsg(getString(R.string.error_user_cancel))
                                     }
-                                    ILockCmd.MSG_ERROR_TIME_INVALID ->{
+                                    ILockCmd.MSG_ERROR_TIME_INVALID -> {
                                         showMsg(getString(R.string.error_time_invalid))
                                     }
-                                    ILockCmd.MSG_ERROR_INDEX_INVALID ->{
+                                    ILockCmd.MSG_ERROR_INDEX_INVALID -> {
                                         showMsg(getString(R.string.error_index_invalid))
                                     }
                                 }
@@ -604,58 +708,58 @@ class LockDetailActivity : AppCompatActivity() {
                             lockTaskId = 0
                         }
 
-                        "delRfCard" ->{
+                        "delRfCard" -> {
                             if (rsp.code == 200) {
                                 isRfCardAdd = false
                                 updateLockUI()
                                 showMsg(getString(R.string.del_rf_card_succ))
-                            }else if (rsp.code == 100) {
+                            } else if (rsp.code == 100) {
                                 val msgId = rsp.data as MsgId
-                                if(msgId.msgId ==  ILockCmd.MSG_READY_TO_SWIPE_CARD) {
+                                if (msgId.msgId == ILockCmd.MSG_READY_TO_SWIPE_CARD) {
                                     showMsg(getString(R.string.ready_to_swipe_rf_card))
                                 }
-                            }else{
+                            } else {
                                 showMsg(getString(R.string.del_rf_card_fail))
                             }
                             lockTaskId = 0
                         }
 
-                        "addFingerprint" ->{
+                        "addFingerprint" -> {
                             val msgId = rsp.data as MsgId
                             if (rsp.code == 200) {
                                 isFingerprintAdd = true
                                 updateLockUI()
                                 showMsg(getString(R.string.add_fingerprint_succ))
-                            }else if (rsp.code == 100) {
-                                when(msgId.msgId){
-                                    ILockCmd.MSG_READY_TO_PRESS_FINGER ->{
+                            } else if (rsp.code == 100) {
+                                when (msgId.msgId) {
+                                    ILockCmd.MSG_READY_TO_PRESS_FINGER -> {
                                         showMsg(getString(R.string.ready_to_press_fingerprint))
                                     }
-                                    ILockCmd.MSG_ACTION_PRESS_FINGER ->{
+                                    ILockCmd.MSG_ACTION_PRESS_FINGER -> {
                                         showMsg(getString(R.string.action_to_press_fingerprint))
                                     }
-                                    ILockCmd.MSG_ACTION_LEAVE_FINGER ->{
+                                    ILockCmd.MSG_ACTION_LEAVE_FINGER -> {
                                         showMsg(getString(R.string.action_to_leave_fingerprint))
                                     }
                                 }
-                            }else{
-                                when(msgId.msgId){
-                                    ILockCmd.MSG_OPERATION_FAIL ->{
+                            } else {
+                                when (msgId.msgId) {
+                                    ILockCmd.MSG_OPERATION_FAIL -> {
                                         showMsg(getString(R.string.add_fingerprint_fail))
                                     }
-                                    ILockCmd.MSG_ERROR_LOGIN_STATE_OFF ->{
+                                    ILockCmd.MSG_ERROR_LOGIN_STATE_OFF -> {
                                         showMsg(getString(R.string.error_login_state_off))
                                     }
-                                    ILockCmd.MSG_ERROR_WAIT_TIMEOUT ->{
+                                    ILockCmd.MSG_ERROR_WAIT_TIMEOUT -> {
                                         showMsg(getString(R.string.error_wait_timeout))
                                     }
-                                    ILockCmd.MSG_ERROR_OPERATION_CANCEL ->{
+                                    ILockCmd.MSG_ERROR_OPERATION_CANCEL -> {
                                         showMsg(getString(R.string.error_user_cancel))
                                     }
-                                    ILockCmd.MSG_ERROR_TIME_INVALID ->{
+                                    ILockCmd.MSG_ERROR_TIME_INVALID -> {
                                         showMsg(getString(R.string.error_time_invalid))
                                     }
-                                    ILockCmd.MSG_ERROR_INDEX_INVALID ->{
+                                    ILockCmd.MSG_ERROR_INDEX_INVALID -> {
                                         showMsg(getString(R.string.error_index_invalid))
                                     }
                                 }
@@ -663,23 +767,103 @@ class LockDetailActivity : AppCompatActivity() {
                             lockTaskId = 0
                         }
 
-                        "delFingerprint" ->{
+                        "delFingerprint" -> {
                             if (rsp.code == 200) {
                                 isFingerprintAdd = false
                                 updateLockUI()
                                 showMsg(getString(R.string.del_fingerprint_succ))
-                            }else{
+                            } else {
                                 showMsg(getString(R.string.del_fingerprint_fail))
                             }
                             lockTaskId = 0
                         }
 
 
-                        "changeAdminPincode" ->{
+                        "changeAdminPincode" -> {
                             if (rsp.code == 200) {
                                 showMsg(getString(R.string.change_admin_pincode_succ))
-                            }else{
+                            } else {
                                 showMsg(getString(R.string.change_admin_pincode_fail))
+                            }
+                            lockTaskId = 0
+                        }
+
+                        "queryLockSlotState" -> {
+                            if (rsp.code == 200) {
+                                val lockState = rsp.data as LockState
+                                if (lockTaskId == 91) {
+                                    showMsg(getString(if (lockState.bool) R.string.lock_slot_state_open else R.string.lock_slot_state_close))
+                                }
+                            } else {
+                                if (lockTaskId == 91) {
+                                    showMsg(getString(R.string.cmd_rsp_fail))
+                                }
+                            }
+                            lockTaskId = 0
+                        }
+
+                        "queryLockUnlockState" -> {
+                            if (rsp.code == 200) {
+                                val lockState = rsp.data as LockState
+                                if (lockTaskId == 92) {
+                                    showMsg(getString(if (lockState.bool) R.string.lock_unlock_state_open else R.string.lock_unlock_state_close))
+                                }
+                            } else {
+                                if (lockTaskId == 92) {
+                                    showMsg(getString(R.string.cmd_rsp_fail))
+                                }
+                            }
+                            lockTaskId = 0
+                        }
+
+                        "setLockUnlockState" -> {
+                            when (rsp.code) {
+                                200 -> {
+                                    val lockState = rsp.data as LockState
+                                    isAlwaysOpen = lockState.bool
+                                    updateLockUI()
+                                    showMsg(getString(if (lockState.bool) R.string.enter_always_open_mode else R.string.exit_always_open_mode))
+                                }
+                                300 -> {
+                                    val msgId = rsp.data as MsgId
+                                    when (msgId.msgId) {
+                                        ILockCmd.MSG_OPERATION_FAIL -> {
+                                            showMsg(getString(R.string.add_fingerprint_fail))
+                                        }
+                                        ILockCmd.MSG_ERROR_LOGIN_STATE_OFF -> {
+                                            showMsg(getString(R.string.error_login_state_off))
+                                        }
+                                    }
+                                }
+                                else -> {
+                                    showMsg(getString(R.string.cmd_rsp_fail))
+                                }
+                            }
+                            lockTaskId = 0
+                        }
+
+                        "setLockMuteState" -> {
+                            when (rsp.code) {
+                                200 -> {
+                                    val lockState = rsp.data as LockState
+                                    isMuted = lockState.bool
+                                    updateLockUI()
+                                    showMsg(getString(if (lockState.bool) R.string.enter_audio_muted_mode else R.string.exit_audio_muted_mode))
+                                }
+                                300 -> {
+                                    val msgId = rsp.data as MsgId
+                                    when (msgId.msgId) {
+                                        ILockCmd.MSG_OPERATION_FAIL -> {
+                                            showMsg(getString(R.string.add_fingerprint_fail))
+                                        }
+                                        ILockCmd.MSG_ERROR_LOGIN_STATE_OFF -> {
+                                            showMsg(getString(R.string.error_login_state_off))
+                                        }
+                                    }
+                                }
+                                else -> {
+                                    showMsg(getString(R.string.cmd_rsp_fail))
+                                }
                             }
                             lockTaskId = 0
                         }
@@ -746,18 +930,52 @@ class LockDetailActivity : AppCompatActivity() {
             81 -> {
                 onChangeAdminPincode()
             }
+            91 -> {
+                onQueryLockSlotState()
+            }
+            92 -> {
+                onQueryLockUnlockState()
+            }
+            101 -> {
+                onChangeLockUnlockState()
+            }
+            102 -> {
+                onChangeLockMutedState()
+            }
             else -> {
 
             }
         }
     }
 
+    private fun onChangeLockUnlockState() {
+        writeBytes(targetBleDevice!!, lockCmdManager.setLockUnlockState(lockName!!, !isAlwaysOpen))
+    }
+
+    private fun onChangeLockMutedState() {
+        writeBytes(targetBleDevice!!, lockCmdManager.setLockMuteState(lockName!!, !isMuted))
+    }
+
+    private fun onQueryLockSlotState() {
+        writeBytes(targetBleDevice!!, lockCmdManager.queryLockSlotState(lockName!!))
+    }
+
+    private fun onQueryLockUnlockState() {
+        writeBytes(targetBleDevice!!, lockCmdManager.queryLockUnlockState(lockName!!))
+    }
+
     private fun onChangeAdminPincode() {
-        writeBytes(targetBleDevice!!, lockCmdManager.changeAdminPincode(lockName!!, macAddress!!, 12345678, 87654321))
+        writeBytes(
+            targetBleDevice!!,
+            lockCmdManager.changeAdminPincode(lockName!!, macAddress!!, 12345678, 87654321)
+        )
     }
 
     private fun onDelFingerprint() {
-        writeBytes(targetBleDevice!!, lockCmdManager.delFingerprint(lockName!!, basecode, fingerprintIndex))
+        writeBytes(
+            targetBleDevice!!,
+            lockCmdManager.delFingerprint(lockName!!, basecode, fingerprintIndex)
+        )
     }
 
     private fun onAddFingerprint() {
@@ -766,12 +984,21 @@ class LockDetailActivity : AppCompatActivity() {
         val timeEnd = Date(timeStart.time + 300000)
         writeBytes(
             targetBleDevice!!,
-            lockCmdManager.addFingerprint(lockName!!, basecode, fingerprintIndex, timeStart, timeEnd)
+            lockCmdManager.addFingerprint(
+                lockName!!,
+                basecode,
+                fingerprintIndex,
+                timeStart,
+                timeEnd
+            )
         )
     }
 
     private fun onDelRfCard() {
-        writeBytes(targetBleDevice!!, lockCmdManager.delRfCard(lockName!!, basecode, rfCardId, rfCardIndex))
+        writeBytes(
+            targetBleDevice!!,
+            lockCmdManager.delRfCard(lockName!!, basecode, rfCardId, rfCardIndex)
+        )
     }
 
     private fun onAddRfCard() {
@@ -780,16 +1007,26 @@ class LockDetailActivity : AppCompatActivity() {
         val timeEnd = Date(timeStart.time + 300000)
         writeBytes(
             targetBleDevice!!,
-            lockCmdManager.addRfCard(lockName!!, basecode, rfCardId, rfCardIndex, timeStart, timeEnd)
+            lockCmdManager.addRfCard(
+                lockName!!,
+                basecode,
+                rfCardId,
+                rfCardIndex,
+                timeStart,
+                timeEnd
+            )
         )
     }
 
     private fun onDelPincode() {
-        writeBytes(targetBleDevice!!, lockCmdManager.delPincode(lockName!!, basecode, pincode, pincodeIndex))
+        writeBytes(
+            targetBleDevice!!,
+            lockCmdManager.delPincode(lockName!!, basecode, pincode, pincodeIndex)
+        )
     }
 
     private fun onAddPincode() {
-        if(dialog != null && dialog!!.isShowing)
+        if (dialog != null && dialog!!.isShowing)
             dialog?.cancel()
 
         dialog = MaterialDialog(this).show {
@@ -800,7 +1037,14 @@ class LockDetailActivity : AppCompatActivity() {
                 val timeEnd = Date(timeStart.time + 300000)
                 writeBytes(
                     targetBleDevice!!,
-                    lockCmdManager.addPincode(lockName!!, basecode, pincode, pincodeIndex, timeStart, timeEnd)
+                    lockCmdManager.addPincode(
+                        lockName!!,
+                        basecode,
+                        pincode,
+                        pincodeIndex,
+                        timeStart,
+                        timeEnd
+                    )
                 )
             }
             positiveButton(R.string.ok)
@@ -828,11 +1072,17 @@ class LockDetailActivity : AppCompatActivity() {
     }
 
     private fun onUnbindLock() {
-        writeBytes(targetBleDevice!!, lockCmdManager.sendUnbindLock(lockName!!, lockId, lockManagerId, basecode))
+        writeBytes(
+            targetBleDevice!!,
+            lockCmdManager.sendUnbindLock(lockName!!, lockId, lockManagerId, basecode)
+        )
     }
 
     private fun onBindLock() {
-        writeBytes(targetBleDevice!!, lockCmdManager.sendBindLock(lockName!!, lockId, lockManagerId, basecode))
+        writeBytes(
+            targetBleDevice!!,
+            lockCmdManager.sendBindLock(lockName!!, lockId, lockManagerId, basecode)
+        )
     }
 
     private fun onQueryBindState() {

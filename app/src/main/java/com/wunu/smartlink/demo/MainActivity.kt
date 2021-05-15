@@ -2,6 +2,7 @@ package com.wunu.smartlink.demo
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -68,6 +69,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onScanning(bleDevice: BleDevice) {
+                if(bleDevice.name == null || TextUtils.isEmpty(bleDevice.name)) return;
                 // 扫描到一个符合扫描规则的BLE设备（主线程）
                 adapter?.addScanResult(bleDevice)
                 Log.d("Main[startScan]", "onScanning: ${bleDevice.name}, ad: ${Hex.encodeHex(bleDevice.getScanRecord()).substring(10, 14)}")

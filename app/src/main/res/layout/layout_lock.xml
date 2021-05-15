@@ -212,4 +212,48 @@
                 android:text="@string/gen_offline_pincode"/>
 
     </LinearLayout>
+    <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+        <Button android:id="@+id/btn_query_slot_state"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/query_slot_state"/>
+
+        <Button android:id="@+id/btn_query_lock_state"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/query_lock_state"/>
+
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+        <Button android:id="@+id/btn_switch_lock_state"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/enter_always_open_mode"/>
+
+        <Button android:id="@+id/btn_switch_mute_state"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/enter_audio_muted_mode"/>
+
+    </LinearLayout>
 </LinearLayout>

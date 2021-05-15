@@ -39,6 +39,12 @@
     <string name="del_fingerprint">删除指纹</string>
     <string name="change_admin_pincode">修改管理密码</string>
     <string name="gen_offline_pincode">生成离线密码</string>
+    <string name="query_slot_state">查询方舌状态</string>
+    <string name="query_lock_state">查询门锁状态</string>
+    <string name="enter_always_open_mode">进入常开模式</string>
+    <string name="exit_always_open_mode">退出常开模式</string>
+    <string name="enter_audio_muted_mode">进入静音模式</string>
+    <string name="exit_audio_muted_mode">退出静音模式</string>
     <string name="ready_to_swipe_rf_card">请刷卡！</string>
     <string name="bind_lock_succ">绑定成功！</string>
     <string name="bind_lock_fail">绑定失败！</string>
@@ -91,4 +97,8 @@
     <string name="error_user_cancel">用户取消操作！</string>
     <string name="error_time_invalid">时间参数有误！</string>
     <string name="error_index_invalid">操作序号有误！</string>
+    <string name="lock_slot_state_open">此门锁方舌打开</string>
+    <string name="lock_slot_state_close">此门锁方舌关闭</string>
+    <string name="lock_unlock_state_open">此门锁已打开</string>
+    <string name="lock_unlock_state_close">此门锁已关闭</string>
 </resources>
